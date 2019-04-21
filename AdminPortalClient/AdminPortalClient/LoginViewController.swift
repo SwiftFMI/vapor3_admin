@@ -25,12 +25,11 @@ class LoginViewController: UIViewController {
         }
         let base64LoginString = loginData.base64EncodedString()
         print(base64LoginString)
-        let url = URL(string: "http://localhost:8080/todos")!
+        let url = URL(string: "http://localhost:8080/permissions/\(usernameTextField.text!)")!
         var request = URLRequest(url: url)
-        request.httpMethod = "POST"
+        request.httpMethod = "GET"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("Basic \(base64LoginString)", forHTTPHeaderField: "Authorization")
-        request.httpBody = try? JSONSerialization.data(withJSONObject: ["title": "test"])
         
         let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
             guard let data = data, error == nil else {
@@ -49,7 +48,7 @@ class LoginViewController: UIViewController {
         let url = URL(string: "http://localhost:8080/api/users/register")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        let parameters: [String: Any] = ["email": usernameTextField.text!, "password": passwordTextField.text!]
+        let parameters: [String: Any] = ["username": usernameTextField.text!, "password": passwordTextField.text!, "permissions": "viewer"]
         request.httpBody = parameters.percentEscaped().data(using: .utf8)
         
         let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
@@ -64,8 +63,6 @@ class LoginViewController: UIViewController {
         
         task.resume()
     }
-    
-    
 }
 
 extension Dictionary {

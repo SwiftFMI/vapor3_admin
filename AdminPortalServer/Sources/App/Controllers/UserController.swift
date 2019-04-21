@@ -22,13 +22,14 @@ class UserController: RouteCollection {
 private extension UserController {
     
     func registerUserHandler(_ request: Request, newUser: User) throws -> Future<HTTPResponseStatus> {
-        return User.query(on: request).filter(\.email == newUser.email).first().flatMap { existingUser in
+        return User.query(on: request).filter(\.username == newUser.username).first().flatMap { existingUser in
             guard existingUser == nil else {
-                throw Abort(.badRequest, reason: "a user with this email already exists" , identifier: nil)
+                throw Abort(.badRequest, reason: "a user with this username already exists" , identifier: nil)
             }
+            
             let digest = try request.make(BCryptDigest.self)
             let hashedPassword = try digest.hash(newUser.password)
-            let persistedUser = User(id: nil, email: newUser.email, password: hashedPassword)
+            let persistedUser = User(id: nil, username: newUser.username, password: hashedPassword, permissions: newUser.permissions)
             
             return persistedUser.save(on: request).transform(to: .created)
         }

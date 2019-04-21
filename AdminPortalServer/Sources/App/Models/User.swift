@@ -6,11 +6,12 @@ import Authentication
 
 struct User: Content, SQLiteUUIDModel, Migration {
     var id: UUID?
-    private(set) var email: String
+    private(set) var username: String
     private(set) var password: String
+    private(set) var permissions: String
 }
 
 extension User: PasswordAuthenticatable {
-    static let usernameKey: WritableKeyPath<User, String> = \.email
+    static let usernameKey: WritableKeyPath<User, String> = \.username
     static let passwordKey: WritableKeyPath<User, String> = \.password
 }
