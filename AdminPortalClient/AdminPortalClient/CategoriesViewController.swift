@@ -10,9 +10,20 @@ import UIKit
 
 class CategoriesViewController: UIViewController {
 
+    @IBOutlet weak var welcomeLabel: UILabel!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
+        
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        if let user = AccountManager.shared.user {
+            DispatchQueue.main.async {
+                self.welcomeLabel.text = "Welcome \(user.username)"
+            }
+        }
     }
 }

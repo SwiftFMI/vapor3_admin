@@ -38,7 +38,17 @@ class AccountManager {
                 return
             }
             
+            AccountManager.shared.user = User(username: usernameUnwrapped, password: passwordUnwrapped, permissions: nil)
+            
             let responseString = String(data: data, encoding: .utf8)
+            if responseString == "viewer" {
+                AccountManager.shared.user?.permissions = .viewer
+            } else if responseString == "uploader" {
+                AccountManager.shared.user?.permissions = .uploader
+            } else if responseString == "admin" {
+                AccountManager.shared.user?.permissions = .admin
+            }
+            
             successClosure?(responseString)
         }
 
@@ -46,7 +56,7 @@ class AccountManager {
     }
     
     static func attemptToRegister(username: String?, password: String?, successClosure: SuccessClosure? = nil, failClosure:  FailClosure? = nil) {
-        guard let usernameUnwrapped = username, let passwordUnwrapped = password else {
+        guard let usernameUnwrapped = username, let passwordUnwrapped = password, usernameUnwrapped != "", passwordUnwrapped != "" else {
             failClosure?(nil)
             return
         }

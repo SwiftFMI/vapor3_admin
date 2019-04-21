@@ -39,7 +39,9 @@ final class TodoController {
             }
             
             let responseString = String(data: data, encoding: .utf8)
-            print("Response: \(responseString ?? "Unknown response")")
+            if responseString == "" {
+                print("Administrator account created")
+            }
         }
         
         task.resume()
