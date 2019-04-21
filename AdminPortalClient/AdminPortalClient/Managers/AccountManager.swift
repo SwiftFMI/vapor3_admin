@@ -12,9 +12,6 @@ typealias SuccessClosure = (String?) -> ()
 typealias FailClosure = (Error?) -> ()
 
 class AccountManager {
-    struct Constants {
-        static let registrationUrl = URL(string: "http://localhost:8080/api/users/register")!
-    }
     
     static let shared: AccountManager = AccountManager()
     
@@ -61,7 +58,7 @@ class AccountManager {
             return
         }
         
-        var request = URLRequest(url: Constants.registrationUrl)
+        var request = URLRequest(url: ServerRequestManager.Constants.registrationUrl)
         request.httpMethod = "POST"
         let parameters: [String: Any] = ["username": usernameUnwrapped, "password": passwordUnwrapped, "permissions": "viewer"]
         request.httpBody = parameters.percentEscaped().data(using: .utf8)

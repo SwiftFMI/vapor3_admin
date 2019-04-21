@@ -70,3 +70,14 @@ extension CharacterSet {
         }
     }
 }
+
+@IBDesignable extension UIImageView {
+    @IBInspectable var cornerRadius: CGFloat {
+        set {
+            layer.cornerRadius = newValue
+        }
+        get {
+            return layer.cornerRadius
+        }
+    }
+}

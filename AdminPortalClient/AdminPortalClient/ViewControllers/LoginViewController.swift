@@ -8,10 +8,11 @@
 
 import UIKit
 
-class LoginViewController: UIViewController {
+final class LoginViewController: UIViewController {
     @IBOutlet weak private var usernameTextField: UITextField!
     @IBOutlet weak private var passwordTextField: UITextField!
     @IBOutlet weak private var errorLabel: UILabel!
+    @IBOutlet var buttons: [UIButton]!
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -19,11 +20,13 @@ class LoginViewController: UIViewController {
     }
     
     @IBAction private func loginTapped(_ sender: Any) {
+        setButtonsInteraction(enabled: false)
         displayMessage()
         AccountManager.attemptToLogin(username: usernameTextField.text, password: passwordTextField.text, successClosure: loginCompletion, failClosure: nil)
     }
     
     @IBAction private func registerTapped(_ sender: Any) {
+        setButtonsInteraction(enabled: false)
         displayMessage()
         AccountManager.attemptToRegister(username: usernameTextField.text, password: passwordTextField.text, successClosure: registerCompletion , failClosure: nil)
     }
@@ -36,6 +39,7 @@ class LoginViewController: UIViewController {
         guard let permissions =  AccountManager.shared.user?.permissions else {
             let responseError = ServerResponse.errorReason(rawJSON: responseUnwrapped)
             if responseError == ServerResponse.Constants.userNotAuthenticated {
+                setButtonsInteraction(enabled: true)
                 displayMessage(message: "Invalid username or password. Please try again.", color: .red)
             }
             return
@@ -43,15 +47,18 @@ class LoginViewController: UIViewController {
         
         displayMessage(message: "Logged in as \(permissions)", color: .green)
         
-        DispatchQueue.main.async {
-            self.performSegue(withIdentifier: "showCategories", sender: nil)
-        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: { [weak self] in
+            self?.performSegue(withIdentifier: "showCategories", sender: nil)
+            self?.setButtonsInteraction(enabled: true)
+        })
     }
     
     private func registerCompletion(response: String?) {
+        setButtonsInteraction(enabled: true)
         guard let responseUnwrapped = response else {
             return
         }
+        
         guard response != "" else {
             displayMessage(message: "Registration successful!", color: .green)
             return
@@ -71,6 +78,22 @@ class LoginViewController: UIViewController {
             self?.errorLabel.text = message
             self?.errorLabel.textColor = color
             self?.errorLabel.isHidden = false
+        }
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        guard segue.identifier == "showCategories" else {
+            return
+        }
+        
+        let backItem = UIBarButtonItem()
+        backItem.title = "Logout"
+        navigationItem.backBarButtonItem = backItem
+    }
+    
+    private func setButtonsInteraction(enabled: Bool) {
+        buttons.forEach { (button) in
+            button.isUserInteractionEnabled = enabled
         }
     }
 }
