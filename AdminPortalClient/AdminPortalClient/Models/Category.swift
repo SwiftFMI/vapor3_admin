@@ -9,8 +9,8 @@
 import Foundation
 import UIKit
 
-struct Category {
-    var image: UIImage
+struct Category: Codable {
     var title: String
     var description: String
+    var image: Data
 }

@@ -11,7 +11,7 @@ import Fluent
 import FluentSQLite
 import Crypto
 
-class UserController: RouteCollection {
+final class UserController: RouteCollection {
     func boot(router: Router) throws {
         let group = router.grouped("api", "users")
         group.post(User.self, at: "register", use: registerUserHandler)

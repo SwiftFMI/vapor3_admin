@@ -22,13 +22,13 @@ final class LoginViewController: UIViewController {
     @IBAction private func loginTapped(_ sender: Any) {
         setButtonsInteraction(enabled: false)
         displayMessage()
-        AccountManager.attemptToLogin(username: usernameTextField.text, password: passwordTextField.text, successClosure: loginCompletion, failClosure: nil)
+        AccountManager.attemptToLogin(username: usernameTextField.text, password: passwordTextField.text, successClosure: loginCompletion, failClosure: failClosure)
     }
     
     @IBAction private func registerTapped(_ sender: Any) {
         setButtonsInteraction(enabled: false)
         displayMessage()
-        AccountManager.attemptToRegister(username: usernameTextField.text, password: passwordTextField.text, successClosure: registerCompletion , failClosure: nil)
+        AccountManager.attemptToRegister(username: usernameTextField.text, password: passwordTextField.text, successClosure: registerCompletion , failClosure: failClosure)
     }
     
     private func loginCompletion(response: String?) {
@@ -40,7 +40,7 @@ final class LoginViewController: UIViewController {
             let responseError = ServerResponse.errorReason(rawJSON: responseUnwrapped)
             if responseError == ServerResponse.Constants.userNotAuthenticated {
                 setButtonsInteraction(enabled: true)
-                displayMessage(message: "Invalid username or password. Please try again.", color: .red)
+                displayMessage(message: ServerResponse.Constants.invalidCredentials, color: .red)
             }
             return
         }
@@ -60,12 +60,21 @@ final class LoginViewController: UIViewController {
         }
         
         guard response != "" else {
-            displayMessage(message: "Registration successful!", color: .green)
+            displayMessage(message: ServerResponse.Constants.registrationSuccessful, color: .green)
             return
         }
         
         let responseError = ServerResponse.errorReason(rawJSON: responseUnwrapped)
         displayMessage(message: responseError, color: .red)
+    }
+    
+    private func failClosure(error: Error?) {
+        setButtonsInteraction(enabled: true)
+        guard error != nil else {
+            return
+        }
+        
+        displayMessage(message: ServerResponse.Constants.unableToConnectMessage, color: .red)
     }
     
     private func displayMessage(message: String? = nil, color: UIColor? = nil) {
@@ -93,7 +102,9 @@ final class LoginViewController: UIViewController {
     
     private func setButtonsInteraction(enabled: Bool) {
         buttons.forEach { (button) in
-            button.isUserInteractionEnabled = enabled
+            DispatchQueue.main.async {
+                 button.isUserInteractionEnabled = enabled
+            }
         }
     }
 }

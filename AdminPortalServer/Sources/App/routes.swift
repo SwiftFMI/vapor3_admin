@@ -6,6 +6,7 @@ import Crypto
 public func routes(_ router: Router) throws {
     
     let todoController = TodoController()
+    let categoryController = CategoryController()
     let basicAuthMiddleware = User.basicAuthMiddleware(using: BCryptDigest())
     let guardAuthMiddleware = User.guardAuthMiddleware()
     let basicAuthGroup = router.grouped([basicAuthMiddleware, guardAuthMiddleware])
@@ -14,6 +15,9 @@ public func routes(_ router: Router) throws {
     basicAuthGroup.post("todos", use: todoController.create)
     basicAuthGroup.delete("todos", use: todoController.delete)
     basicAuthGroup.get("permissions", String.parameter, use: authPermissionRequest)
+    basicAuthGroup.post("category", "create", use: categoryController.create)
+    basicAuthGroup.post("category", "list", use: categoryController.request)
+   
     
     let userRouteController = UserController()
     try userRouteController.boot(router: router)

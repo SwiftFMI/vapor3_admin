@@ -3,6 +3,7 @@ import Vapor
 /// Controls basic CRUD operations on `Todo`s.
 final class TodoController {
     
+    /// Creates the Administrator user
     init() {
         registerAdminUser()
     }

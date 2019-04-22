@@ -16,6 +16,7 @@ class AccountManager {
     static let shared: AccountManager = AccountManager()
     
     var user: User?
+    var categories: [Category]?
     
     static func attemptToLogin(username: String?, password: String?, successClosure: SuccessClosure?, failClosure:  FailClosure?) {
         guard let usernameUnwrapped = username, let passwordUnwrapped = password, let auth = "\(usernameUnwrapped):\(passwordUnwrapped)".data(using: .utf8)?.base64EncodedString() else {
@@ -58,7 +59,7 @@ class AccountManager {
             return
         }
         
-        var request = URLRequest(url: ServerRequestManager.Constants.registrationUrl)
+        var request = URLRequest(url: ServerRequestManager.Constants.Url.registration)
         request.httpMethod = "POST"
         let parameters: [String: Any] = ["username": usernameUnwrapped, "password": passwordUnwrapped, "permissions": "viewer"]
         request.httpBody = parameters.percentEscaped().data(using: .utf8)
