@@ -19,7 +19,11 @@ final class CategoriesViewController: UIViewController {
         tableView.dataSource = self
         
         navigationItem.title = "Logged in as '\(AccountManager.shared.user?.username ?? "user")'"
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(rightBarButtonItemTapped))
+        
+        if let user = AccountManager.shared.user, let permissions = user.permissions, permissions.canAddCategories {
+            navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(rightBarButtonItemTapped))
+        }
+        
         
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = 600

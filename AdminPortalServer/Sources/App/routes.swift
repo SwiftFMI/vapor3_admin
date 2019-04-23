@@ -16,11 +16,13 @@ public func routes(_ router: Router) throws {
     basicAuthGroup.delete("todos", use: todoController.delete)
     basicAuthGroup.get("permissions", String.parameter, use: authPermissionRequest)
     basicAuthGroup.post("category", "create", use: categoryController.create)
-    basicAuthGroup.post("category", "list", use: categoryController.request)
+    basicAuthGroup.post("category", use: categoryController.request)
    
     
     let userRouteController = UserController()
     try userRouteController.boot(router: router)
+    
+    UserController.registerAdminUser()
 }
 
 func authPermissionRequest(_ request: Request) throws-> Future<String> {

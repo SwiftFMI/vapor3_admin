@@ -16,6 +16,27 @@ final class UserController: RouteCollection {
         let group = router.grouped("api", "users")
         group.post(User.self, at: "register", use: registerUserHandler)
     }
+    
+    static func registerAdminUser() {
+        let url = URL(string: "http://localhost:8080/api/users/register")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.httpBody = "permissions=admin&password=admin&username=admin".data(using: .utf8)
+        
+        let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
+            guard let data = data, error == nil else {
+                print("error", error ?? "Unknown error")
+                return
+            }
+            
+            let responseString = String(data: data, encoding: .utf8)
+            if responseString == "" {
+                print("Administrator account created")
+            }
+        }
+        
+        task.resume()
+    }
 }
 
 //MARK: Helper

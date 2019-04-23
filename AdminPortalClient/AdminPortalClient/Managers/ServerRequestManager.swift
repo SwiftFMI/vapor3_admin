@@ -13,7 +13,7 @@ final class ServerRequestManager {
         struct Url {
             static let registration   =  URL(string: "http://localhost:8080/api/users/register")!
             static let createCategory =  URL(string: "http://localhost:8080/category/create")!
-            static let category       =  URL(string: "http://localhost:8080/category/list")!
+            static let category       =  URL(string: "http://localhost:8080/category")!
         }
     }
     
