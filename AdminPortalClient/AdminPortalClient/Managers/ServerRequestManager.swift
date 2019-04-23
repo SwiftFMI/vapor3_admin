@@ -15,12 +15,12 @@ final class ServerRequestManager {
             static let createCategory =  URL(string: "http://localhost:8080/category/create")!
             static let category       =  URL(string: "http://localhost:8080/category/list")!
         }
-        
     }
     
-    static func createCategory(_ jsonData: Data?) {
+    static func createCategory(_ jsonData: Data?, completion: @escaping (Bool) -> ()) {
         guard let auth = "\(AccountManager.shared.user?.username ?? ""):\(AccountManager.shared.user?.password ?? "")".data(using: .utf8)?.base64EncodedString() else {
             print("generic error")
+            completion(false)
             return
         }
         
@@ -33,19 +33,22 @@ final class ServerRequestManager {
         let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
             guard let data = data, error == nil else {
                 print(error ?? "generic error")
+                completion(false)
                 return
             }
             
             let responseString = String(data: data, encoding: .utf8)
             print(responseString ?? "generic response")
+            completion(true)
         }
         
         task.resume()
     }
     
-    static func fetchCategories() {
+    static func fetchCategories(completion: @escaping (Bool) -> ()) {
         guard let auth = "\(AccountManager.shared.user?.username ?? ""):\(AccountManager.shared.user?.password ?? "")".data(using: .utf8)?.base64EncodedString() else {
             print("generic error")
+            completion(false)
             return
         }
         
@@ -56,11 +59,13 @@ final class ServerRequestManager {
         let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
             guard let data = data, error == nil else {
                 print(error ?? "generic error")
+                completion(false)
                 return
             }
             
             AccountManager.shared.categories = try? JSONDecoder().decode([Category].self, from: data)
             print("Categories content: \(AccountManager.shared.categories)")
+            completion(true)
         }
         
         task.resume()

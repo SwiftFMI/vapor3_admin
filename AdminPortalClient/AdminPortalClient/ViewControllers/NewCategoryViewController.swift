@@ -37,10 +37,15 @@ final class NewCategoryViewController: UIViewController, UINavigationControllerD
     
     // MARK: - IBActions
     @IBAction func createCategoryTapped(_ sender: Any) {
-        let imageData = imageView.image?.jpegData(compressionQuality: 0)
-        let category = Category(title: titleTextField.text ?? "" , description: descriptionTextField.text ?? "", image: imageData!)
+        guard let imageData = imageView.image?.jpegData(compressionQuality: 0), let textFieldText = titleTextField.text, let descriptionFieldText = descriptionTextField.text else {
+            return
+        }
+        
+        let category = Category(title: textFieldText , description: descriptionFieldText, image: imageData)
         let categoryData = try? JSONEncoder().encode(category)
-        ServerRequestManager.createCategory(categoryData)
+        ServerRequestManager.createCategory(categoryData) { [weak self] success in
+            self?.dismiss(animated: true, completion: nil)
+        }
     }
     
     @IBAction func cancelTapped(_ sender: Any) {

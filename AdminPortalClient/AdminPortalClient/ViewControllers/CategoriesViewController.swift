@@ -9,9 +9,8 @@
 import UIKit
 
 final class CategoriesViewController: UIViewController {
-
-    @IBOutlet private weak var welcomeLabel: UILabel!
     @IBOutlet weak var tableView: UITableView!
+    private let refreshControl = UIRefreshControl()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -19,22 +18,43 @@ final class CategoriesViewController: UIViewController {
         tableView.delegate = self
         tableView.dataSource = self
         
-        if let user = AccountManager.shared.user {
-            let attributedString = NSMutableAttributedString(string: "Welcome \(user.username)", attributes: nil)
-            let welcomeCount = "Welcome ".count
-            let usernameRange = NSRange(location: welcomeCount, length: attributedString.string.count - welcomeCount)
-            attributedString.setAttributes([.font: UIFont.boldSystemFont(ofSize: 18)], range: usernameRange)
-            welcomeLabel.attributedText = attributedString
-        }
+        navigationItem.title = "Logged in as '\(AccountManager.shared.user?.username ?? "user")'"
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(rightBarButtonItemTapped))
+        
+        tableView.rowHeight = UITableView.automaticDimension
+        tableView.estimatedRowHeight = 600
+        
+        refreshControl.addTarget(nil, action: #selector(pullToRefreshAction), for: .valueChanged)
+        tableView.addSubview(refreshControl)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        ServerRequestManager.fetchCategories()
+        fetchCategories()
+    }
+    
+    // MARK: - Private
+    
+    private func fetchCategories() {
+        ServerRequestManager.fetchCategories { [weak self] success in
+            DispatchQueue.main.async {
+                self?.tableView.reloadData()
+                self?.refreshControl.endRefreshing()
+            }
+        }
+    }
+    
+    @objc private func rightBarButtonItemTapped(_ sender: Any) {
+        performSegue(withIdentifier: "showNewCategory", sender: nil)
+    }
+    
+    @objc private func pullToRefreshAction(_ sender: Any) {
+        fetchCategories()
     }
 }
 
+// MARK: - UITableViewDelegate + UITableViewDataSource
 extension CategoriesViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         guard let categories = AccountManager.shared.categories else {
