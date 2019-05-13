@@ -11,7 +11,7 @@ import Foundation
 struct ServerResponse: Codable {
     struct Constants {
         static let userNotAuthenticated = "User not authenticated."
-        static let existingUser = "a user with this username already exists"
+        static let existingUser = "A user with this username already exists"
         static let unableToConnectMessage = "Unable to connect to server."
         static let registrationSuccessful = "Registration successful!"
         static let invalidCredentials = "Invalid username or password. Please try again."

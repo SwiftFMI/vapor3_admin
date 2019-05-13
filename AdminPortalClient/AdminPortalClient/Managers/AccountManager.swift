@@ -14,29 +14,31 @@ typealias FailClosure = (Error?) -> ()
 class AccountManager {
     
     static let shared: AccountManager = AccountManager()
+    static let authentication: String = {
+        return  "Basic " + ("\(AccountManager.shared.user?.username ?? ""):\(AccountManager.shared.user?.password ?? "")".data(using: .utf8)?.base64EncodedString() ?? "")
+    }()
     
     var user: User?
-    var categories: [Category]?
     
     static func attemptToLogin(username: String?, password: String?, successClosure: SuccessClosure?, failClosure:  FailClosure?) {
-        guard let usernameUnwrapped = username, let passwordUnwrapped = password, let auth = "\(usernameUnwrapped):\(passwordUnwrapped)".data(using: .utf8)?.base64EncodedString() else {
+        guard let usernameUnwrapped = username, let passwordUnwrapped = password else {
             failClosure?(nil)
             return
         }
+        
+        AccountManager.shared.user = User(username: usernameUnwrapped, password: passwordUnwrapped, permissions: nil)
         
         let url = URL(string: "http://localhost:8080/permissions/\(usernameUnwrapped)")!
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("Basic \(auth)", forHTTPHeaderField: "Authorization")
+        request.setValue(AccountManager.authentication, forHTTPHeaderField: "Authorization")
         
         let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
             guard let data = data, error == nil else {
                 failClosure?(error)
                 return
             }
-            
-            AccountManager.shared.user = User(username: usernameUnwrapped, password: passwordUnwrapped, permissions: nil)
             
             let responseString = String(data: data, encoding: .utf8)
             if responseString == "viewer" {

@@ -12,6 +12,9 @@ import FluentSQLite
 import Crypto
 
 final class UserController: RouteCollection {
+    struct Constants {
+        static let existingUserError = "A user with this username already exists"
+    }
     func boot(router: Router) throws {
         let group = router.grouped("api", "users")
         group.post(User.self, at: "register", use: registerUserHandler)

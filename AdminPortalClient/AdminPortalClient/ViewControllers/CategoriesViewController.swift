@@ -11,6 +11,7 @@ import UIKit
 final class CategoriesViewController: UIViewController {
     @IBOutlet weak var tableView: UITableView!
     private let refreshControl = UIRefreshControl()
+    private var categories = [Category]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -39,9 +40,15 @@ final class CategoriesViewController: UIViewController {
     }
     
     // MARK: - Private
-    
     private func fetchCategories() {
-        ServerRequestManager.fetchCategories { [weak self] success in
+        ServerRequestManager.fetchCategories { [weak self] categories in
+            guard let categoriesUnwrapped = categories else {
+                self?.refreshControl.endRefreshing()
+                return
+            }
+            
+            self?.categories = categoriesUnwrapped
+            
             DispatchQueue.main.async {
                 self?.tableView.reloadData()
                 self?.refreshControl.endRefreshing()
@@ -61,18 +68,10 @@ final class CategoriesViewController: UIViewController {
 // MARK: - UITableViewDelegate + UITableViewDataSource
 extension CategoriesViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        guard let categories = AccountManager.shared.categories else {
-            return 0
-        }
-        
         return categories.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let categories = AccountManager.shared.categories else {
-            return UITableViewCell()
-        }
-        
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryTableViewCell") as? CategoryTableViewCell else {
             return UITableViewCell()
         }

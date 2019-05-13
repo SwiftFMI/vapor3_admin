@@ -11,21 +11,29 @@ import HTTP
 
 final class CategoryController {
     
-    var categories = [Category]()
+    var videosInCategory = [(category: Category, videoUUIDs: [UUID])]()
     
     /// Saves a decoded Category
-    func create(_ req: Request) throws -> Future<Category> {
-        print("creating category")
-        return try req.content.decode(Category.self).flatMap { category in
+    func createNewCategory(_ req: Request) throws -> Future<Category> {
+        print("Creating category")
+        return try req.content.decode(Category.self).flatMap { [weak self] category in
             return category.save(on: req).map({ (category) -> Category in
                 print(category)
+                self?.videosInCategory.append((category: category, videoUUIDs: []))
                 return category
             })
         }
     }
     
     /// Returns all Categories
-    func request(_ req: Request) throws -> Future<[Category]> {
+    func requestAllCategories(_ req: Request) throws -> Future<[Category]> {
         return Category.query(on: req).all()
     }
+    
+//    /// Returns video UUIDs in a Category
+//    func requestVideosInCategory(_ req: Request) throws -> Future<[UUID]> {
+////        let id = try req.query.decode(Int.self)
+////        let videoUUIDs = videosInCategory[id].videoUUIDs
+//
+//    }
 }
