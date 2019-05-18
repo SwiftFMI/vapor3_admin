@@ -31,7 +31,7 @@ final class NewCategoryViewController: UIViewController {
             return
         }
         
-        let category = Category(title: textFieldText , description: descriptionFieldText, image: imageData)
+        let category = Category(id: nil, title: textFieldText , description: descriptionFieldText, image: imageData, videos: [])
         let categoryData = try? JSONEncoder().encode(category)
         ServerRequestManager.createCategory(categoryData) { [weak self] success in
             self?.dismiss(animated: true, completion: nil)

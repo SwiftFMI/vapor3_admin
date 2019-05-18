@@ -11,7 +11,7 @@ import HTTP
 
 final class CategoryController {
     
-    var videosInCategory = [(category: Category, videoUUIDs: [UUID])]()
+    var videosInCategory = [(category: Category, videos: [Video])]()
     
     /// Saves a decoded Category
     func createNewCategory(_ req: Request) throws -> Future<Category> {
@@ -19,7 +19,7 @@ final class CategoryController {
         return try req.content.decode(Category.self).flatMap { [weak self] category in
             return category.save(on: req).map({ (category) -> Category in
                 print(category)
-                self?.videosInCategory.append((category: category, videoUUIDs: []))
+                self?.videosInCategory.append((category: category, videos: []))
                 return category
             })
         }
@@ -27,13 +27,20 @@ final class CategoryController {
     
     /// Returns all Categories
     func requestAllCategories(_ req: Request) throws -> Future<[Category]> {
+        print("Requested: \(Category.query(on: req).all())")
         return Category.query(on: req).all()
     }
     
-//    /// Returns video UUIDs in a Category
-//    func requestVideosInCategory(_ req: Request) throws -> Future<[UUID]> {
-////        let id = try req.query.decode(Int.self)
-////        let videoUUIDs = videosInCategory[id].videoUUIDs
-//
-//    }
+    /// Returns video UUIDs in a Category
+    func requestVideosInCategory(_ req: Request) throws -> Future<[Video]> {
+        let categoryId = try req.parameters.next(String.self)
+        return Category.find(UUID(categoryId) ?? UUID(), on: req).map({ (category) in
+            guard let categoryUnwrapped = category else {
+                return []
+            }
+            
+            return categoryUnwrapped.videos
+        })
+        
+    }
 }

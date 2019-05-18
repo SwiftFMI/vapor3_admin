@@ -9,7 +9,10 @@
 import Foundation
 
 struct Category: Codable {
+    var id: UUID?
+    
     var title: String
     var description: String
     var image: Data
+    var videos: [Video]
 }

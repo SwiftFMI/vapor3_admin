@@ -15,7 +15,19 @@ class AccountManager {
     
     static let shared: AccountManager = AccountManager()
     static let authentication: String = {
-        return  "Basic " + ("\(AccountManager.shared.user?.username ?? ""):\(AccountManager.shared.user?.password ?? "")".data(using: .utf8)?.base64EncodedString() ?? "")
+        guard let user = AccountManager.shared.user else {
+            return ""
+        }
+        
+        let loginString = "\(user.username):\(user.password)"
+        
+        guard let loginData = loginString.data(using: String.Encoding.utf8) else {
+            return ""
+        }
+        
+        let base64LoginString = loginData.base64EncodedString()
+        
+        return "Basic \(base64LoginString)"
     }()
     
     var user: User?

@@ -9,6 +9,7 @@
 import UIKit
 
 final class CategoriesViewController: UIViewController {
+
     @IBOutlet weak var tableView: UITableView!
     private let refreshControl = UIRefreshControl()
     private var categories = [Category]()
@@ -37,6 +38,14 @@ final class CategoriesViewController: UIViewController {
         super.viewWillAppear(animated)
         
         fetchCategories()
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        guard let videosViewController = segue.destination as? VideosViewController, let videos = sender as? [Video] else {
+            return
+        }
+        
+        videosViewController.videos = videos
     }
     
     // MARK: - Private
@@ -76,10 +85,22 @@ extension CategoriesViewController: UITableViewDelegate, UITableViewDataSource {
             return UITableViewCell()
         }
         
-        cell.categoryImageView.image = UIImage(data: categories[indexPath.row].image)
-        cell.titleLabel.text = categories[indexPath.row].title
-        cell.descriptionLabel.text = categories[indexPath.row].description
+        cell.configureWith(category: categories[indexPath.row])
         
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard indexPath.row < categories.count else {
+            return
+        }
+        
+        ServerRequestManager.fetchVideos(forCategory: categories[indexPath.row]) { [weak self] (videos) in
+            guard let videosUnwrapped = videos else {
+                return
+            }
+            
+            self?.performSegue(withIdentifier: "showVideos", sender: videosUnwrapped)
+        }
     }
 }

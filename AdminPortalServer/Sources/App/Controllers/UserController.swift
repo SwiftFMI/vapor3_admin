@@ -40,6 +40,13 @@ final class UserController: RouteCollection {
         
         task.resume()
     }
+    
+    func authPermissionRequest(_ request: Request) throws-> Future<String> {
+        let name = try request.parameters.next(String.self)
+        return User.query(on: request).filter(\.username == name).first().unwrap(or: Abort(.notFound)).map { (user) -> (String) in
+            return user.permissions
+        }
+    }
 }
 
 //MARK: Helper

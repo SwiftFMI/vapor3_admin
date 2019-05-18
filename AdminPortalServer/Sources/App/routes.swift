@@ -5,28 +5,22 @@ import Crypto
 /// Register your application's routes here.
 public func routes(_ router: Router) throws {
     let categoryController = CategoryController()
+    let userController = UserController()
     let basicAuthMiddleware = User.basicAuthMiddleware(using: BCryptDigest())
     let guardAuthMiddleware = User.guardAuthMiddleware()
     let basicAuthGroup = router.grouped([basicAuthMiddleware, guardAuthMiddleware])
     
-    basicAuthGroup.get("permissions", String.parameter, use: authPermissionRequest)
+    basicAuthGroup.get("permissions", String.parameter, use: userController.authPermissionRequest)
     basicAuthGroup.post("category", "create", use: categoryController.createNewCategory)
     basicAuthGroup.post("category", use: categoryController.requestAllCategories)
-//    
-//    basicAuthGroup.post([PathComponent.constant("category"), PathComponent.parameter("id"), PathComponent.constant("media")], use: categoryController.requestVideosInCategory)
     
-    let userRouteController = UserController()
-    try userRouteController.boot(router: router)
+    basicAuthGroup.get([PathComponent.constant("category"), PathComponent.parameter("uuid"), PathComponent.constant("media")], use: categoryController.requestVideosInCategory)
     
-    UserController.registerAdminUser()
+    try userController.boot(router: router)
+    //UserController.registerAdminUser()
 }
 
-func authPermissionRequest(_ request: Request) throws-> Future<String> {
-    let name = try request.parameters.next(String.self)
-    return User.query(on: request).filter(\.username == name).first().unwrap(or: Abort(.notFound)).map { (user) -> (String) in
-        return user.permissions
-    }
-}
+
 
 func registerUserHandler(_ request: Request, newUser: User) throws -> Future<HTTPResponseStatus> {
     return User.query(on: request).filter(\.username == newUser.username).first().flatMap { existingUser in

@@ -9,6 +9,8 @@
 import Foundation
 
 struct Video: Codable {
+    var id: UUID?
+    
     var title: String
     var description: String
     var url: URL

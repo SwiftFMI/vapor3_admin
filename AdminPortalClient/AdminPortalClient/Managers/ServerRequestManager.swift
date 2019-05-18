@@ -61,9 +61,14 @@ final class ServerRequestManager {
         task.resume()
     }
     
-    static func fetchVideosForCategory(withID id: Int, completion: @escaping ([Video]?) -> ()) {
-        var request = URLRequest(url: Constants.Url.localhost.appendingPathComponent("/id=\(id)/media"))
-        request.httpMethod = "POST"
+    static func fetchVideos(forCategory category: Category, completion: @escaping ([Video]?) -> ()) {
+        guard let categoryUUID = category.id else {
+            completion(nil)
+            return
+        }
+        
+        var request = URLRequest(url: Constants.Url.localhost.appendingPathComponent("category/string=\(categoryUUID)/media"))
+        request.httpMethod = "GET"
         request.setValue(AccountManager.authentication, forHTTPHeaderField: "Authorization")
         
         let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
@@ -72,6 +77,7 @@ final class ServerRequestManager {
                 return
             }
             
+            print("Videos content: \(videos)")
             completion(videos)
         }
         

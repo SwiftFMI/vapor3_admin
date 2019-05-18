@@ -17,4 +17,5 @@ struct Category: Content, SQLiteUUIDModel, Migration {
     var title: String
     var description: String
     var image: Data
+    var videos: [Video]
 }

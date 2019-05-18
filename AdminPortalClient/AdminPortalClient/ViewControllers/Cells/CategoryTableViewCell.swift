@@ -9,13 +9,13 @@
 import UIKit
 
 final class CategoryTableViewCell: UITableViewCell {
-    @IBOutlet weak var categoryImageView: UIImageView!
-    @IBOutlet weak var titleLabel: UILabel!
-    @IBOutlet weak var descriptionLabel: UILabel!
+    @IBOutlet private weak var categoryImageView: UIImageView!
+    @IBOutlet private weak var titleLabel: UILabel!
+    @IBOutlet private weak var descriptionLabel: UILabel!
     
-    
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        
+    func configureWith(category: Category) {
+        categoryImageView.image = UIImage(data: category.image)
+        titleLabel.text = category.title
+        descriptionLabel.text = category.description
     }
 }

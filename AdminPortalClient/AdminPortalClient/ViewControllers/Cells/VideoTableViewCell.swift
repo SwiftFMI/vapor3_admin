@@ -7,3 +7,14 @@
 //
 
 import Foundation
+import UIKit
+
+final class VideoTableViewCell: UITableViewCell {
+    @IBOutlet private weak var titleLabel: UILabel!
+    @IBOutlet private weak var descriptionLabel: UILabel!
+    
+    func configureWith(video: Video) {
+        titleLabel.text = video.title
+        descriptionLabel.text = video.description
+    }
+}

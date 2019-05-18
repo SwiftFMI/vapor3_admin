@@ -17,8 +17,10 @@ final class LoginViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         displayMessage()
+        registerAdminUser()
     }
     
+    // MARK: - IBActions
     @IBAction private func loginTapped(_ sender: Any) {
         setButtonsInteraction(enabled: false)
         displayMessage()
@@ -29,6 +31,28 @@ final class LoginViewController: UIViewController {
         setButtonsInteraction(enabled: false)
         displayMessage()
         AccountManager.attemptToRegister(username: usernameTextField.text, password: passwordTextField.text, successClosure: registerCompletion , failClosure: failClosure)
+    }
+    
+    // MARK: - Private
+    func registerAdminUser() {
+        let url = URL(string: "http://localhost:8080/api/users/register")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.httpBody = "permissions=admin&password=admin&username=admin".data(using: .utf8)
+        
+        let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
+            guard let data = data, error == nil else {
+                print("error", error ?? "Unknown error")
+                return
+            }
+            
+            let responseString = String(data: data, encoding: .utf8)
+            if responseString == "" {
+                print("Administrator account created")
+            }
+        }
+        
+        task.resume()
     }
     
     private func loginCompletion(response: String?) {
@@ -46,11 +70,10 @@ final class LoginViewController: UIViewController {
         }
         
         displayMessage(message: "Logged in as \(permissions)", color: .green)
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: { [weak self] in
+        DispatchQueue.main.async { [weak self] in
             self?.performSegue(withIdentifier: "showCategories", sender: nil)
             self?.setButtonsInteraction(enabled: true)
-        })
+        }
     }
     
     private func registerCompletion(response: String?) {
@@ -90,6 +113,14 @@ final class LoginViewController: UIViewController {
         }
     }
     
+    private func setButtonsInteraction(enabled: Bool) {
+        buttons.forEach { (button) in
+            DispatchQueue.main.async {
+                 button.isUserInteractionEnabled = enabled
+            }
+        }
+    }
+    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         guard segue.identifier == "showCategories" else {
             return
@@ -98,13 +129,5 @@ final class LoginViewController: UIViewController {
         let backItem = UIBarButtonItem()
         backItem.title = "Logout"
         navigationItem.backBarButtonItem = backItem
-    }
-    
-    private func setButtonsInteraction(enabled: Bool) {
-        buttons.forEach { (button) in
-            DispatchQueue.main.async {
-                 button.isUserInteractionEnabled = enabled
-            }
-        }
     }
 }
