@@ -104,3 +104,4 @@ extension CategoriesViewController: UITableViewDelegate, UITableViewDataSource {
         }
     }
 }
+

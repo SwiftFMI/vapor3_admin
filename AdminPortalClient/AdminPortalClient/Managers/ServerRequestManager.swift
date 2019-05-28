@@ -67,7 +67,7 @@ final class ServerRequestManager {
             return
         }
         
-        var request = URLRequest(url: Constants.Url.localhost.appendingPathComponent("category/string=\(categoryUUID)/media"))
+        var request = URLRequest(url: Constants.Url.localhost.appendingPathComponent("category/uuid=\(categoryUUID.uuidString)/media"))
         request.httpMethod = "GET"
         request.setValue(AccountManager.authentication, forHTTPHeaderField: "Authorization")
         

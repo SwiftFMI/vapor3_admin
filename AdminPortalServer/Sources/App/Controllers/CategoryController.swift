@@ -33,7 +33,8 @@ final class CategoryController {
     
     /// Returns video UUIDs in a Category
     func requestVideosInCategory(_ req: Request) throws -> Future<[Video]> {
-        let categoryId = try req.parameters.next(String.self)
+        var categoryId = req.parameters.rawValues(for: UUID.self)[0]
+        categoryId = String(categoryId.dropFirst(5)) 
         return Category.find(UUID(categoryId) ?? UUID(), on: req).map({ (category) in
             guard let categoryUnwrapped = category else {
                 return []
@@ -41,6 +42,5 @@ final class CategoryController {
             
             return categoryUnwrapped.videos
         })
-        
     }
 }

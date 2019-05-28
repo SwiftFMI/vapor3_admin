@@ -20,8 +20,6 @@ public func routes(_ router: Router) throws {
     //UserController.registerAdminUser()
 }
 
-
-
 func registerUserHandler(_ request: Request, newUser: User) throws -> Future<HTTPResponseStatus> {
     return User.query(on: request).filter(\.username == newUser.username).first().flatMap { existingUser in
         guard existingUser == nil else {
