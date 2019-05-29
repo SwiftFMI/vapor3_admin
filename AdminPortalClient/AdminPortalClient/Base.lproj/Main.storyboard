@@ -223,6 +223,15 @@
                                 <subviews>
                                     <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="xnh-qL-a74">
                                         <rect key="frame" x="0.0" y="0.0" width="414" height="70"/>
+                                        <subviews>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zwq-x1-OfO">
+                                                <rect key="frame" x="0.0" y="0.0" width="414" height="70"/>
+                                                <state key="normal" title="Add video"/>
+                                                <connections>
+                                                    <action selector="addVideoButtonTapped:" destination="c77-GD-idd" eventType="touchUpInside" id="hSr-G6-IgW"/>
+                                                </connections>
+                                            </button>
+                                        </subviews>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="70" id="gHw-52-bNh"/>
                                         </constraints>

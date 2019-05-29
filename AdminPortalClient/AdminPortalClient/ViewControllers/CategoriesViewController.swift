@@ -41,11 +41,13 @@ final class CategoriesViewController: UIViewController {
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        guard let videosViewController = segue.destination as? VideosViewController, let videos = sender as? [Video] else {
+        guard let videosViewController = segue.destination as? VideosViewController, let senderUnwrapped = sender as? (Category, [Video]) else {
             return
         }
         
-        videosViewController.videos = videos
+        videosViewController.navigationItem.title = senderUnwrapped.0.title
+        videosViewController.category = senderUnwrapped.0
+        videosViewController.videos = senderUnwrapped.1
     }
     
     // MARK: - Private
@@ -100,7 +102,9 @@ extension CategoriesViewController: UITableViewDelegate, UITableViewDataSource {
                 return
             }
             
-            self?.performSegue(withIdentifier: "showVideos", sender: videosUnwrapped)
+            DispatchQueue.main.async {
+                self?.performSegue(withIdentifier: "showVideos", sender: (self?.categories[indexPath.row], videosUnwrapped))
+            }
         }
     }
 }

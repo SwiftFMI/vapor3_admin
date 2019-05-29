@@ -17,6 +17,16 @@ final class ServerRequestManager {
             static let registration   =  URL(string: "http://localhost:8080/api/users/register")!
             static let createCategory =  URL(string: "http://localhost:8080/category/create")!
             static let category       =  URL(string: "http://localhost:8080/category")!
+            
+            static func uploadVideoIn(category: Category) -> URL? {
+                guard let categoryID = category.id else {
+                    return nil
+                }
+                
+                var url = localhost
+                url.appendPathComponent("addvideo/categoryuuid=\(categoryID.uuidString)")
+                return url
+            }
         }
     }
     
@@ -82,5 +92,27 @@ final class ServerRequestManager {
         }
         
         task.resume()
+    }
+    
+    static func upload(videoURL: URL, toCategory category: Category, completion: @escaping (Bool) -> ()) {
+        do {
+            guard let uploadLink = ServerRequestManager.Constants.Url.uploadVideoIn(category: category) else {
+                completion(false)
+                return
+            }
+            
+            let data = try Data(contentsOf: videoURL, options: .mappedIfSafe)
+            let headers: HTTPHeaders = ["Content-type": "multipart/form-data"]
+            AF.upload(multipartFormData: { multipartFormData in
+                multipartFormData.append(data, withName: "upload_data", fileName: "\(UUID().uuidString)")
+            }, to: uploadLink, method: .post, headers: headers)
+                .response { response in
+                    print(response)
+            }
+            
+            completion(true)
+        } catch {
+            completion(false)
+        }
     }
 }

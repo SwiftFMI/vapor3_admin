@@ -34,7 +34,7 @@ final class CategoryController {
     /// Returns video UUIDs in a Category
     func requestVideosInCategory(_ req: Request) throws -> Future<[Video]> {
         var categoryId = req.parameters.rawValues(for: UUID.self)[0]
-        categoryId = String(categoryId.dropFirst(5)) 
+        categoryId = String(categoryId.dropFirst(5))
         return Category.find(UUID(categoryId) ?? UUID(), on: req).map({ (category) in
             guard let categoryUnwrapped = category else {
                 return []
@@ -43,4 +43,13 @@ final class CategoryController {
             return categoryUnwrapped.videos
         })
     }
+    
+//    func uploadVideo(_ req: Request) throws -> Future<HTTPResponse> {
+//        let video = try req.content.decode(Video.self)
+//        var categoryId = req.parameters.rawValues(for: UUID.self)[0]
+//        categoryId = String(categoryId.dropFirst(5))
+//        return Category.query(on: req).first().map { category in
+//            category?.videos.append(Video(id: UUID(), title: "asd", description: "asd", url: URL(string: "asd")!))
+//        }
+//    }
 }

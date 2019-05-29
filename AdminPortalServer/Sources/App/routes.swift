@@ -15,6 +15,7 @@ public func routes(_ router: Router) throws {
     basicAuthGroup.post("category", use: categoryController.requestAllCategories)
     
     basicAuthGroup.get([PathComponent.constant("category"), PathComponent.parameter("uuid"), PathComponent.constant("media")], use: categoryController.requestVideosInCategory)
+    basicAuthGroup.post([PathComponent.constant("addvideo"), PathComponent.parameter("categoryuuid")], use: categoryController.uploadVideo)
     
     try userController.boot(router: router)
     //UserController.registerAdminUser()
