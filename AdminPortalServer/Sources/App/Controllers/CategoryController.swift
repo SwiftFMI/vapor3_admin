@@ -35,6 +35,7 @@ final class CategoryController {
     func requestVideosInCategory(_ req: Request) throws -> Future<[Video]> {
         var categoryId = req.parameters.rawValues(for: UUID.self)[0]
         categoryId = String(categoryId.dropFirst(5))
+        
         return Category.find(UUID(categoryId) ?? UUID(), on: req).map({ (category) in
             guard let categoryUnwrapped = category else {
                 return []
@@ -44,12 +45,18 @@ final class CategoryController {
         })
     }
     
-//    func uploadVideo(_ req: Request) throws -> Future<HTTPResponse> {
-//        let video = try req.content.decode(Video.self)
-//        var categoryId = req.parameters.rawValues(for: UUID.self)[0]
-//        categoryId = String(categoryId.dropFirst(5))
-//        return Category.query(on: req).first().map { category in
-//            category?.videos.append(Video(id: UUID(), title: "asd", description: "asd", url: URL(string: "asd")!))
+    func uploadVideo(_ req: Request) throws -> Future<HTTPResponseStatus> {
+        var categoryUUIDString = req.parameters.rawValues(for: UUID.self)[0]
+        categoryUUIDString = String(categoryUUIDString.dropFirst(5))
+        
+//        guard let categoryUUID = UUID(categoryUUIDString) else {
+//            throw Abort(.badRequest, reason: "Invalid UUID")
 //        }
-//    }
+        
+        return try req.content.decode(File.self).map(to: HTTPResponseStatus.self) { (file) in
+            let writeDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent(categoryUUIDString)
+            try file.data.write(to: writeDirectory)
+            return .accepted
+        }
+    }
 }

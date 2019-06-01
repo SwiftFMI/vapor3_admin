@@ -24,7 +24,7 @@ final class ServerRequestManager {
                 }
                 
                 var url = localhost
-                url.appendPathComponent("addvideo/categoryuuid=\(categoryID.uuidString)")
+                url.appendPathComponent("addvideo/uuid=\(categoryID.uuidString)")
                 return url
             }
         }
@@ -101,13 +101,14 @@ final class ServerRequestManager {
                 return
             }
             
-            let data = try Data(contentsOf: videoURL, options: .mappedIfSafe)
-            let headers: HTTPHeaders = ["Content-type": "multipart/form-data"]
+            let videoData = try Data(contentsOf: videoURL, options: .mappedIfSafe)
+            let headers: HTTPHeaders = ["Content-type": "multipart/form-data", "Authorization" : AccountManager.authentication]
             AF.upload(multipartFormData: { multipartFormData in
-                multipartFormData.append(data, withName: "upload_data", fileName: "\(UUID().uuidString)")
+                multipartFormData.append(videoData, withName: "video", fileName: "\(videoURL.lastPathComponent)")
             }, to: uploadLink, method: .post, headers: headers)
                 .response { response in
                     print(response)
+
             }
             
             completion(true)
