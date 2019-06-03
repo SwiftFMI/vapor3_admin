@@ -8,6 +8,7 @@
 import Foundation
 import Vapor
 import HTTP
+import Multipart
 
 final class CategoryController {
     
@@ -49,13 +50,12 @@ final class CategoryController {
         var categoryUUIDString = req.parameters.rawValues(for: UUID.self)[0]
         categoryUUIDString = String(categoryUUIDString.dropFirst(5))
         
-//        guard let categoryUUID = UUID(categoryUUIDString) else {
-//            throw Abort(.badRequest, reason: "Invalid UUID")
-//        }
+        
         
         return try req.content.decode(File.self).map(to: HTTPResponseStatus.self) { (file) in
             let writeDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent(categoryUUIDString)
-            try file.data.write(to: writeDirectory)
+            //let fileURL = file.filename
+            try file.data.write(to: writeDirectory, options: .atomic)
             return .accepted
         }
     }

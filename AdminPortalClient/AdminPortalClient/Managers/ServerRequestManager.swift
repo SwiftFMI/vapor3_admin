@@ -101,14 +101,14 @@ final class ServerRequestManager {
                 return
             }
             
-            let videoData = try Data(contentsOf: videoURL, options: .mappedIfSafe)
-            let headers: HTTPHeaders = ["Content-type": "multipart/form-data", "Authorization" : AccountManager.authentication]
+            let videoData = try Data(contentsOf: videoURL)
+            let headers: HTTPHeaders = ["Authorization" : AccountManager.authentication, "Content-type": "multipart/form-data"]
+            
             AF.upload(multipartFormData: { multipartFormData in
-                multipartFormData.append(videoData, withName: "video", fileName: "\(videoURL.lastPathComponent)")
+                multipartFormData.append(videoData, withName: "filename", fileName: videoURL.lastPathComponent, mimeType: "quicktime/mov")
             }, to: uploadLink, method: .post, headers: headers)
                 .response { response in
                     print(response)
-
             }
             
             completion(true)
