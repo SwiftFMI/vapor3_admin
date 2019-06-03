@@ -24,6 +24,7 @@ final class LoginViewController: UIViewController {
     @IBAction private func loginTapped(_ sender: Any) {
         setButtonsInteraction(enabled: false)
         displayMessage()
+        
         AccountManager.attemptToLogin(username: usernameTextField.text, password: passwordTextField.text, successClosure: loginCompletion, failClosure: failClosure)
     }
     
@@ -56,7 +57,7 @@ final class LoginViewController: UIViewController {
     }
     
     private func loginCompletion(response: String?) {
-        guard let responseUnwrapped = response else {
+        guard let responseUnwrapped = response, let userPermissions = AccountManager.shared.user?.permissions, userPermissions.canViewContent else {
             return
         }
         

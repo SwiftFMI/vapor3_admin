@@ -10,7 +10,11 @@ import UIKit
 
 final class CategoriesViewController: UIViewController {
 
-    @IBOutlet weak var tableView: UITableView!
+    @IBOutlet private weak var tableView: UITableView!
+    @IBOutlet private weak var addCategoryButton: UIButton!
+    @IBOutlet private weak var modifyCategoriesButton: UIButton!
+    @IBOutlet private weak var moderateUsersButton: UIButton!
+    
     private let refreshControl = UIRefreshControl()
     private var categories = [Category]()
     
@@ -22,16 +26,13 @@ final class CategoriesViewController: UIViewController {
         
         navigationItem.title = "Logged in as '\(AccountManager.shared.user?.username ?? "user")'"
         
-        if let user = AccountManager.shared.user, let permissions = user.permissions, permissions.canAddCategories {
-            navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(rightBarButtonItemTapped))
-        }
-        
-        
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = 600
         
         refreshControl.addTarget(nil, action: #selector(pullToRefreshAction), for: .valueChanged)
         tableView.addSubview(refreshControl)
+        
+        showPermittedActions()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -67,12 +68,31 @@ final class CategoriesViewController: UIViewController {
         }
     }
     
-    @objc private func rightBarButtonItemTapped(_ sender: Any) {
+    @objc private func pullToRefreshAction(_ sender: Any) {
+        fetchCategories()
+    }
+    
+    private func showPermittedActions() {
+        guard let userPermissions = AccountManager.shared.user?.permissions else {
+            return
+        }
+        
+        addCategoryButton.isHidden = !userPermissions.canAddCategories
+        modifyCategoriesButton.isHidden = !userPermissions.canModifyCategories
+        moderateUsersButton.isHidden = !userPermissions.canModerateUsers
+    }
+    
+    // MARK: - IBActions
+    @IBAction func addCategoryButtonTapped(_ sender: Any) {
         performSegue(withIdentifier: "showNewCategory", sender: nil)
     }
     
-    @objc private func pullToRefreshAction(_ sender: Any) {
-        fetchCategories()
+    @IBAction func modifyCategoriesButtonTapped(_ sender: Any) {
+        // TODO
+    }
+    
+    @IBAction func moderateUsers(_ sender: Any) {
+        
     }
 }
 
